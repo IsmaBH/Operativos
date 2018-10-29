@@ -490,7 +490,7 @@ void Produce(int i, int call_flag, int msg_flag, llamadas *ptr1, mensajes *ptr2)
 	}
 }
 
-void Consume(int i, int consumido, int call_flag, int msg_flag, llamadas *ptr1, mensajes *ptr2)
+void Consume(int i, int call_flag, int msg_flag, llamadas *ptr1, mensajes *ptr2)
 {
 	int proc = 0;
 	int total, subtotal;
@@ -502,7 +502,7 @@ void Consume(int i, int consumido, int call_flag, int msg_flag, llamadas *ptr1, 
 	total = subtotal*2;
 	if (i == 0)
 	{
-		while((total-consumido) > 0)
+		while((total-consumido) >= 0)
 		{
 			if (call_flag == 0)
 			{
@@ -628,7 +628,7 @@ void Consume(int i, int consumido, int call_flag, int msg_flag, llamadas *ptr1, 
 	}
 	if (i == 1)
 	{
-		while((total-consumido) > 0)
+		while((total-consumido) >= 0)
 		{
 			if (call_flag == 0)
 			{
@@ -754,7 +754,7 @@ void Consume(int i, int consumido, int call_flag, int msg_flag, llamadas *ptr1, 
 	}
 	if (i == 2)
 	{
-		while((total-consumido) > 0)
+		while((total-consumido) >= 0)
 		{
 			if (call_flag == 0)
 			{
@@ -891,24 +891,28 @@ void Escribe_llamadas(int id, char* buffer)
 			fputs(buffer,fichero);
 			fclose(fichero);
 			doSignal(SEM_SCU1_1,semid);
+			break;
 		case 2:
 			doWait(SEM_SCU2_1,semid);
-			fichero = fopen("Usuario2_llamadastxt","a");
+			fichero = fopen("Usuario2_llamadas.txt","a");
 			fputs(buffer,fichero);
 			fclose(fichero);
 			doSignal(SEM_SCU2_1,semid);
+			break;
 		case 3:
 			doWait(SEM_SCU3_1,semid);
 			fichero = fopen("Usuario3_llamadas.txt","a");
 			fputs(buffer,fichero);
 			fclose(fichero);
 			doSignal(SEM_SCU3_1,semid);
+			break;
 		case 4:
 			doWait(SEM_SCU4_1,semid);
 			fichero = fopen("Usuario4_llamadas.txt","a");
 			fputs(buffer,fichero);
 			fclose(fichero);
 			doSignal(SEM_SCU4_1,semid);
+			break;
 	}
 }
 
@@ -923,23 +927,27 @@ void Escribe_msg(int id, char* buffer)
 			fputs(buffer,fichero);
 			fclose(fichero);
 			doSignal(SEM_SCU1_2,semid);
+			break;
 		case 2:
 			doWait(SEM_SCU2_2,semid);
 			fichero = fopen("Usuario2_msg.txt","a");
 			fputs(buffer,fichero);
 			fclose(fichero);
 			doSignal(SEM_SCU2_2,semid);
+			break;
 		case 3:
 			doWait(SEM_SCU3_2,semid);
 			fichero = fopen("Usuario3_msg.txt","a");
 			fputs(buffer,fichero);
 			fclose(fichero);
 			doSignal(SEM_SCU3_2,semid);
+			break;
 		case 4:
 			doWait(SEM_SCU4_2,semid);
 			fichero = fopen("Usuario4_msg.txt","a");
 			fputs(buffer,fichero);
 			fclose(fichero);
 			doSignal(SEM_SCU4_2,semid);
+			break;
 	}
 }

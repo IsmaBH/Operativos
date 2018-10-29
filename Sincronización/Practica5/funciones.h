@@ -40,7 +40,7 @@
 int semid;
 int memid2;
 int memid;
-//int consumido;
+int consumido;
 
 typedef struct
 {

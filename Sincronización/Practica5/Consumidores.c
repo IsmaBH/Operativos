@@ -13,7 +13,7 @@ int main()
 	crear_ligar_sem(llave);
 	ptr1 = crear_ligar_mem1(llave);
 	ptr2 = crear_ligar_mem2(llave2);
-	int consumido = 0;
+	consumido = 0;
 	printf("semid:%d\t memid:%d memid2:%d\n",semid,memid,memid2);
 
 	for (i = 0; i < 3; i++)
@@ -27,7 +27,7 @@ int main()
 				break;
 			case 0:
 				/*hijos*/
-				Consume(i, consumido, call_flag, msg_flag, ptr1, ptr2);
+				Consume(i, call_flag, msg_flag, ptr1, ptr2);
 				exit(0);
 				break;
 			default:
