@@ -7,12 +7,13 @@ int main()
 	int i, call_flag, msg_flag;
 	llamadas *ptr1;
 	mensajes *ptr2;
-	key_t llave;
+	key_t llave, llave2;
 	llave = ftok("/bin/ls",21);
+	llave2 = ftok("/bin/ls",22);
 	crear_ligar_sem(llave);
 	ptr1 = crear_ligar_mem1(llave);
-	ptr2 = crear_ligar_mem2(llave);
-	printf("semid:%d\t memid:%d\n",semid,memid);
+	ptr2 = crear_ligar_mem2(llave2);
+	printf("semid:%d\t memid1:%d memid2:%d\n",semid,memid,memid2);
 
 	for (i = 0; i < 4; i++)
 	{

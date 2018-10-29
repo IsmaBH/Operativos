@@ -128,6 +128,6 @@ void crear_ligar_sem(key_t llave)
         semctl(semid,SEM_SCU4_1,SETVAL,1);
         semctl(semid,SEM_SCU4_2,SETVAL,1);
         /*Se inicializa el semaforo auxiliar*/
-        semctl(semid,SEM_AUX,SETVAL,0);
+        semctl(semid,SEM_AUX,SETVAL,1);
     }
 }

@@ -35,23 +35,24 @@
 #define SEM_AUX 22
 
 #define NUM_SEM 23
-#define PRODUCCION 10000
+#define PRODUCCION 10
 
 int semid;
 int memid2;
 int memid;
+//int consumido;
 
 typedef struct
 {
     int bandera;
-    char tel[10];
+    char tel[12];
     int P_ID;
 }llamadas[5];
 
 typedef struct
 {
 	int bandera;
-	char msg[10];
+	char msg[12];
 	int P_ID;
 }mensajes[5];
 
