@@ -28,6 +28,7 @@ int main()
 			case 0:
 				/*hijos*/
 				Consume(i, call_flag, msg_flag, ptr1, ptr2);
+				printf("EL consumidor %d termino de consumir\n", i);
 				exit(0);
 				break;
 			default:
@@ -41,6 +42,7 @@ int main()
 					wait(&status);
 					wait(&status);
 					wait(&status);
+					//break;
 				}
 				//break;
 		}
@@ -49,7 +51,7 @@ int main()
 	//se desliga de la memoria
     shmdt(ptr1);
     shmdt(ptr2);
-    printf("finaliza la producción\n");
+    printf("finaliza el consumo\n");
     shmctl(memid,IPC_RMID,0);
     shmctl(memid2, IPC_RMID,0);
     semctl(semid,0,IPC_RMID);

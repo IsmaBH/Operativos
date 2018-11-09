@@ -1,8 +1,10 @@
 #include "funciones.h"
 #include "funciones2.h"
 
-void doWait(int numsem,int semid)
-{  
+// -1 si error y 0 si exito semop
+int doWait(int numsem,int semid)
+{ 
+    int id; 
     struct sembuf operacion;
     /*cerramos el semáforo del proceso padre*/
     operacion.sem_num = numsem;
@@ -11,11 +13,13 @@ void doWait(int numsem,int semid)
     operacion.sem_flg = SEM_UNDO;
     /*aplicamos las operaciones, el 1 indica el numero de structuras que
     * tiene el arreglo*/
-    semop(semid,&operacion,1);
+    id = semop(semid,&operacion,1);
+    return id;
 }
 
-void doSignal(int numsem,int semid)
+int doSignal(int numsem,int semid)
 {
+    int id;
     struct sembuf operacion;
     /*cerramos el semáforo del proceso padre*/
     operacion.sem_num = numsem;
@@ -24,7 +28,8 @@ void doSignal(int numsem,int semid)
     operacion.sem_flg = SEM_UNDO;
     /*aplicamos las operaciones, el 1 indica el numero de structuras que
  * tiene el arreglo*/
-    semop(semid,&operacion,1);
+    id = semop(semid,&operacion,1);
+    return id;
 }
 
 llamadas * crear_ligar_mem1(key_t llave_mem)
