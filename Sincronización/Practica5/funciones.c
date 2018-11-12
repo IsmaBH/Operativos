@@ -88,6 +88,34 @@ mensajes * crear_ligar_mem2(key_t llave_mem)
     return ptr;
 }
 
+condicion * crear_ligar_mem3(key_t llave_mem)
+{
+    int i = 0;
+    condicion *ptr = NULL;
+
+    if((memid3 = shmget(llave_mem,sizeof(condicion),IPC_CREAT | IPC_EXCL| 0600)) == -1)
+    {
+    //ligando a la memoria
+        if((memid3 = shmget(llave_mem,sizeof(condicion), 0600)) == -1)
+        {
+            printf("no se puede ligar con la memoria\n");
+            exit(-1);
+        }
+        else{
+            printf("Se ligo a memoria\n");
+        }
+    }
+    else{
+        printf("Se creo memoria\n");
+    }
+    if((ptr = (condicion *)shmat(memid3,0,0)) == NULL)
+    {
+        printf("no se pude crear memoria compartida\n");
+        exit(-1);
+    }
+    return ptr;
+}
+
 void crear_ligar_sem(key_t llave)
 {
     if((semid = semget(llave,NUM_SEM,IPC_CREAT| IPC_EXCL | 0600)) == -1)

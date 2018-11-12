@@ -7,14 +7,19 @@ int main()
 	int i, call_flag, msg_flag;
 	llamadas *ptr1;
 	mensajes *ptr2;
-	key_t llave, llave2;
+	condicion *parar;
+	key_t llave, llave2, llave3;
 	llave = ftok("/bin/ls",21);
 	llave2 = ftok("/bin/ls",22);
+	llave3 = ftok("/bin/ls",23);
 	crear_ligar_sem(llave);
 	ptr1 = crear_ligar_mem1(llave);
 	ptr2 = crear_ligar_mem2(llave2);
-	consumido = 0;
+	parar = crear_ligar_mem3(llave3);
 	printf("semid:%d\t memid:%d memid2:%d\n",semid,memid,memid2);
+	TOTAL = TODO;
+	parar[1]->paro = TOTAL;
+	printf("%d\n", TOTAL);
 
 	for (i = 0; i < 3; i++)
 	{
@@ -27,7 +32,7 @@ int main()
 				break;
 			case 0:
 				/*hijos*/
-				Consume(i, call_flag, msg_flag, ptr1, ptr2);
+				Consume(i, call_flag, msg_flag, ptr1, ptr2, parar);
 				printf("EL consumidor %d termino de consumir\n", i);
 				exit(0);
 				break;

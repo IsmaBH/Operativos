@@ -36,11 +36,14 @@
 
 #define NUM_SEM 23
 #define PRODUCCION 10000
+#define SUB PRODUCCION*4
+#define TODO SUB*2
 
 int semid;
 int memid2;
 int memid;
-int consumido;
+int memid3;
+int TOTAL;
 
 typedef struct
 {
@@ -56,8 +59,14 @@ typedef struct
 	int P_ID;
 }mensajes[5];
 
+typedef struct
+{
+	int paro;
+}condicion[1];
+
 int doWait(int numsem,int semid);
 int doSignal(int numsem,int semid);
 llamadas * crear_ligar_mem1(key_t llave_mem);
 mensajes * crear_ligar_mem2(key_t llave_mem);
+condicion * crear_ligar_mem3(key_t llave_mem);
 void crear_ligar_sem(key_t llave);
