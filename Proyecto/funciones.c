@@ -8,6 +8,7 @@ void analiza(int opt, int fd1, char *myfifo1)
     char estado2[5] = "2P";
     char estado3[2] = "3S";
     char estado5[2] = "5P";
+    char estado6[2] = "6S";
 	char * orden = "fin\n";
 	switch(opt)
 	{
@@ -49,7 +50,13 @@ void analiza(int opt, int fd1, char *myfifo1)
             //Cerramos para poder obtener una respuesta
             close(fd1);
             break;
-		//case 6:
+		case 6:
+            //Preguntamos al administrador por el estado de las paginas
+            fd1 = open(myfifo1,O_WRONLY);
+            write(fd1, estado6, sizeof(estado6));
+            //Cerramos para poder obtener una respuesta
+            close(fd1);
+            break;
 		//case 7:
 		case 0:
 			fd1 = open(myfifo1,O_WRONLY);
@@ -61,11 +68,12 @@ void analiza(int opt, int fd1, char *myfifo1)
 	}
 }
 
-int administra(char *str1, int fd1, char * myfifo1, unsigned char ** Dir_RAM, unsigned char ** Dir_SWAP, lista *L, int ram, int swap)
+int administra(char *str1, int fd1, char * myfifo1, unsigned char ** Dir_RAM, unsigned char ** Dir_SWAP, lista *L, int ram)
 {
-	int i,j = 0;
+	int i,k,j = 0;
 	int memoria, vejez = 0; 
-    int contador_aux = 0;
+    int contador_swap = 0,contador_aux = 0;
+    int auxV = 1, espacio_aux = 0;
     char aux1 = 'P';
     char mem[3];
     char proc[3];
@@ -148,8 +156,10 @@ int administra(char *str1, int fd1, char * myfifo1, unsigned char ** Dir_RAM, un
             return ram;
     		break;
     	case '3':
+            close(fd1);
             //Aqui son las operaciones para encontrar al proceso mas viejo
-            for (int k = 1; k <= process; ++k)
+            etiqueta_1:
+            for (k = auxV; k <= process; ++k)
             {
                 p1 = First(&L[0]);
                 for (i=1;i<=Size(&L[0]);i++)
@@ -157,23 +167,86 @@ int administra(char *str1, int fd1, char * myfifo1, unsigned char ** Dir_RAM, un
                     e1=Position(&L[0],p1);
                     if (e1.TTL == k)
                     {
-                        vejez == e1.TTL;
+                        vejez = e1.TTL;
                         break;
                     }
                     p1=Following(&L[0],p1);
                 }
                 if (vejez != 0)
                 {
+                    printf("Encontre al proceso: %d\n", vejez);
                     break;
                 }
             }
-    	case '4':
-    	case '5':
-            //Con esto imprimimos las paginas
+            //Calculamos el tamaño del proceso y se pregunta si hay espacio disponible
+            //dentro de la memoria SWAP
             p1 = First(&L[0]);
             for (i=1;i<=Size(&L[0]);i++)
             {
-                printf("Pagina %d:\n", i);
+                e1=Position(&L[0],p1);
+                if (e1.TTL == vejez)
+                {
+                    espacio_aux = espacio_aux + e1.PAG_TAM;
+                }
+                p1=Following(&L[0],p1);
+            }
+            if (espacio_aux <= swap)
+            {
+                //Aqui se hacen las operaciones para hacer el swapping
+                p1 = First(&L[0]);
+                for (i=1;i<=Size(&L[0]);i++)
+                {
+                    e1=Position(&L[0],p1);
+                    if (e1.TTL == vejez)
+                    {
+                        contador_swap = contador_swap + e1.PAG_TAM;
+                        p2 = First(&L[1]);
+                        for (int p = 1; p <= Size(&L[1]); ++p)
+                        {
+                            e2=Position(&L[1],p2);
+                            if (e2.ID_PROCESO == 0)
+                            {
+                                e2 = e1;
+                                e1.ID_MEM_FISICA = 0;
+                                e1.ID_PROCESO = 0;
+                                e1.TTL = 0;
+                                Replace(&L[1], p2, e2);
+                                Replace(&L[0], p1, e1);
+                                break;
+                            }
+                            p2=Following(&L[1],p2);
+                        }
+                    }
+                    p1=Following(&L[0],p1);
+                }
+                swap = swap - contador_swap;
+                ram = ram + contador_swap;
+                printf("Se transfirio a swap el proceso: %d\n", vejez);
+                printf("Memoria SWAP restante: %d\n", swap);
+                return ram;
+                break;
+            }else{
+                if (vejez < process)
+                {
+                    auxV = vejez+1;
+                    vejez = 0;
+                    espacio_aux = 0;
+                    goto etiqueta_1;
+                }else{
+                    printf("La memoria swap no tiene suficiente capacidad\n");
+                    printf("para almacenar cualquiera de los procesos existentes\n");
+                    break;
+                } 
+            }
+            //break;
+    	case '4':
+    	case '5':
+            //Con esto imprimimos las paginas
+            close(fd1);
+            p1 = First(&L[0]);
+            for (i=1;i<=Size(&L[0]);i++)
+            {
+                printf("Pagina %d en RAM:\n", i);
                 e1=Position(&L[0],p1);
                 printf("\tID de pagina:%d\n",e1.ID_PAGINA);
                 printf("\tID de memoria fisica:%d\n",e1.ID_MEM_FISICA);
@@ -185,6 +258,22 @@ int administra(char *str1, int fd1, char * myfifo1, unsigned char ** Dir_RAM, un
             }
             break;
     	case '6':
+            //Con esto imprimimos las paginas
+        close(fd1);
+            p2 = First(&L[1]);
+            for (i=1;i<=Size(&L[1]);i++)
+            {
+                printf("Pagina %d en SWAP:\n", i);
+                e2=Position(&L[1],p2);
+                printf("\tID de pagina:%d\n",e2.ID_PAGINA);
+                printf("\tID de memoria fisica:%d\n",e2.ID_MEM_FISICA);
+                printf("\tID de proceso:%d\n",e2.ID_PROCESO);
+                printf("\tTTL:%d\n",e2.TTL);
+                printf("\tNumero de segmento:%d\n",e2.NO_SEGMENTO);
+                printf("\tTamaño de pagina:%d\n",e2.PAG_TAM);
+                p2=Following(&L[1],p2);
+            }
+            break;
     	case '7':
     		break;
     }

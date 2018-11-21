@@ -7,7 +7,7 @@ int main(int argc, char const *argv[])
 {
     int fd1, rowA, rowB, col, i;
     int ram = 144;
-    int swap = 96;
+    swap = 96;
     process = 0;
     unsigned char **Dir_RAM = NULL;
     unsigned char **Dir_SWAP = NULL;
@@ -72,7 +72,7 @@ int main(int argc, char const *argv[])
         read(fd1, str1, sizeof(str1));
         if ((strcmp(str1,orden)) != 0)
         {
-            ram = administra(str1, fd1, myfifo1, Dir_RAM, Dir_SWAP, L, ram, swap);
+            ram = administra(str1, fd1, myfifo1, Dir_RAM, Dir_SWAP, L, ram);
         }else{
             //Destruir las listas
             for(i=0;i<NUM_LISTAS;i++)

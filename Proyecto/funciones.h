@@ -9,7 +9,8 @@
 #include "TADListaD.h"
 
 int process;
+int swap;
 char str1[80], str2[80], str3[80], str4[80];
 
 void analiza(int opt, int fd2, char *myfifo1);
-int administra(char *str1, int fd1, char * myfifo1, unsigned char ** Dir_RAM, unsigned char ** Dir_SWAP, lista *L, int ram, int swap);
+int administra(char *str1, int fd1, char * myfifo1, unsigned char ** Dir_RAM, unsigned char ** Dir_SWAP, lista *L, int ram);
