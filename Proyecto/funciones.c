@@ -7,6 +7,7 @@ void analiza(int opt, int fd1, char *myfifo1)
 	char estado1[6] = "1P";
     char estado2[5] = "2P";
     char estado3[2] = "3S";
+    char estado4[2] = "4S";
     char estado5[2] = "5P";
     char estado6[2] = "6S";
 	char * orden = "fin\n";
@@ -42,7 +43,14 @@ void analiza(int opt, int fd1, char *myfifo1)
             //Cerramos para poder obtener una respuesta
             close(fd1);
             break;
-		//case 4:
+		case 4:
+            //Preguntamos al administrador si existe el proceso solicitado en RAM
+            fd1 = open(myfifo1,O_WRONLY);
+            //La "S" pregunta por la memoria secundaria
+            write(fd1, estado4, sizeof(estado4));
+            //Cerramos para poder obtener una respuesta
+            close(fd1);
+            break;
 		case 5:
             //Preguntamos al administrador por el estado de las paginas
             fd1 = open(myfifo1,O_WRONLY);
@@ -72,7 +80,9 @@ int administra(char *str1, int fd1, char * myfifo1, unsigned char ** Dir_RAM, un
 	int i,k,j = 0;
 	int memoria, vejez = 0; 
     int contador_swap = 0,contador_aux = 0;
+    int contador_ram = 0;
     int auxV = 1, espacio_aux = 0;
+    int espacio_rec = 0;
     char aux1 = 'P';
     char mem[3];
     char proc[3];
@@ -88,10 +98,8 @@ int administra(char *str1, int fd1, char * myfifo1, unsigned char ** Dir_RAM, un
     	case '1':
             memcpy(mem, str1 + 2, 3);
             memoria = atoi(mem);    
-            // Imprimimos el mensaje obtenido
-            printf("Soy el cliente 1 y recibi el mensaje: %s\n", str1); 
+            // Imprimimos el mensaje obtenido 
             printf("Memoria solicitada:%d\n", memoria);
-            printf("Opcion solicitada: %c\n", opt);
             close(fd1);
             if (aux1 == tipo)
             {
@@ -156,7 +164,7 @@ int administra(char *str1, int fd1, char * myfifo1, unsigned char ** Dir_RAM, un
     		break;
     	case '3':
             close(fd1);
-            //Aqui son las operaciones para encontrar al proceso mas viejo
+            //Aqui son las operaciones para encontrar al proceso mas viejo en RAM
             etiqueta_1:
             for (k = auxV; k <= process; ++k)
             {
@@ -237,8 +245,91 @@ int administra(char *str1, int fd1, char * myfifo1, unsigned char ** Dir_RAM, un
                     break;
                 } 
             }
-            //break;
+           break;
     	case '4':
+            close(fd1);
+            //Aqui son las operaciones para encontrar al proceso mas viejo en swap
+            etiqueta_2:
+            for (k = auxV; k <= process; ++k)
+            {
+                p2 = First(&L[1]);
+                for (i=1;i<=Size(&L[1]);i++)
+                {
+                    e2=Position(&L[1],p2);
+                    if (e2.TTL == k)
+                    {
+                        vejez = e2.TTL;
+                        break;
+                    }
+                    p2=Following(&L[1],p2);
+                }
+                if (vejez != 0)
+                {
+                    printf("Encontre al proceso: %d\n", vejez);
+                    break;
+                }
+            }
+            //Calculamos el tamaño del proceso y se pregunta si hay espacio disponible
+            //dentro de la memoria SWAP
+            p2 = First(&L[1]);
+            for (i=1;i<=Size(&L[1]);i++)
+            {
+                e2=Position(&L[1],p2);
+                if (e2.TTL == vejez)
+                {
+                    espacio_rec = espacio_rec + e2.PAG_TAM;
+                }
+                p2=Following(&L[1],p2);
+            }
+            if (espacio_rec <= ram)
+            {
+                //Aqui se hacen las operaciones para hacer el swapping
+                p2 = First(&L[1]);
+                for (i=1;i<=Size(&L[1]);i++)
+                {
+                    e2=Position(&L[1],p2);
+                    if (e2.TTL == vejez)
+                    {
+                        contador_ram = contador_ram + e2.PAG_TAM;
+                        p1 = First(&L[0]);
+                        for (int p = 1; p <= Size(&L[0]); ++p)
+                        {
+                            e1=Position(&L[0],p1);
+                            if (e1.ID_PROCESO == 0)
+                            {
+                                e1 = e2;
+                                e2.ID_MEM_FISICA = 0;
+                                e2.ID_PROCESO = 0;
+                                e2.TTL = 0;
+                                Replace(&L[1], p2, e2);
+                                Replace(&L[0], p1, e1);
+                                break;
+                            }
+                            p1=Following(&L[0],p1);
+                        }
+                    }
+                    p2=Following(&L[1],p2);
+                }
+                swap = swap + contador_ram;
+                ram = ram - contador_ram;
+                printf("Se transfirio a ram el proceso: %d\n", vejez);
+                printf("Memoria RAM restante: %d\n", ram);
+                return ram;
+                break;
+            }else{
+                if (vejez < process)
+                {
+                    auxV = vejez+1;
+                    vejez = 0;
+                    espacio_aux = 0;
+                    goto etiqueta_2;
+                }else{
+                    printf("La memoria ram no tiene suficiente capacidad\n");
+                    printf("para almacenar cualquiera de los procesos existentes\n");
+                    break;
+                } 
+            }
+            break;
     	case '5':
             //Con esto imprimimos las paginas
             close(fd1);
