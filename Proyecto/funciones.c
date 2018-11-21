@@ -57,7 +57,6 @@ void analiza(int opt, int fd1, char *myfifo1)
             //Cerramos para poder obtener una respuesta
             close(fd1);
             break;
-		//case 7:
 		case 0:
 			fd1 = open(myfifo1,O_WRONLY);
 			strcpy(str4,orden);
@@ -259,7 +258,7 @@ int administra(char *str1, int fd1, char * myfifo1, unsigned char ** Dir_RAM, un
             break;
     	case '6':
             //Con esto imprimimos las paginas
-        close(fd1);
+            close(fd1);
             p2 = First(&L[1]);
             for (i=1;i<=Size(&L[1]);i++)
             {
@@ -274,7 +273,5 @@ int administra(char *str1, int fd1, char * myfifo1, unsigned char ** Dir_RAM, un
                 p2=Following(&L[1],p2);
             }
             break;
-    	case '7':
-    		break;
     }
 }
