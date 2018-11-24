@@ -78,13 +78,45 @@ void Imprime_Matriz(unsigned char **matriz, int row, int col)
 	}
 }
 
-int* obten_Fila(int** matriz, int x, int colA, int *fila)
+unsigned char administra_matriz(unsigned char** matriz, int id, int orden, int row, unsigned char *fila)
 {
-	for (int i = 0; i < colA; ++i)
+	int x,y;
+	if (orden == 0)
 	{
-		fila[i] = matriz[x][i];
+		x = 2;
+		for (int i = 0; i < row; ++i)
+		{
+			if (matriz[i][x] == 0x00)
+			{
+				matriz[i][x] = id;
+				y = i;
+				break;
+			}
+		}
+		for (int i = 0; i < 3; ++i)
+		{
+			fila[i] = matriz[y][i];
+		}
+		return fila[0];
 	}
-	return fila;
+	if (orden != 0)
+	{
+		x = 2;
+		for (int i = 0; i < row; ++i)
+		{
+			if (matriz[i][x] == id)
+			{
+				matriz[i][x] = 0x00;
+				y = i;
+				break;
+			}
+		}
+		for (int i = 0; i < 3; ++i)
+		{
+			fila[i] = matriz[y][i];
+		}
+		return fila[0];
+	}
 }
 int Multiplica_Matrices(int** matrizB, int y, int rowB, int colB, int* fila, int resultado)
 {

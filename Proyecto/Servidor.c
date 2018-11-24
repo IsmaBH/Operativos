@@ -38,6 +38,7 @@ int main()
                         printf("4.- Recuperar proceso de swap\n");
                         printf("5.- Mostrar tabla de memoria Logica\n");
                         printf("6.- Mostrar tabla de memoria swap\n");
+                        printf("7.- Mostrar tablas de memoria fisica\n");
                         printf("0.- Salir\n");
                         printf(">> ");
                         scanf("%d", &opt);

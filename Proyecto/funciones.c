@@ -10,6 +10,7 @@ void analiza(int opt, int fd1, char *myfifo1)
     char estado4[2] = "4S";
     char estado5[2] = "5P";
     char estado6[2] = "6S";
+    char estado7[2] = "7S";
 	char * orden = "fin\n";
 	switch(opt)
 	{
@@ -65,6 +66,13 @@ void analiza(int opt, int fd1, char *myfifo1)
             //Cerramos para poder obtener una respuesta
             close(fd1);
             break;
+        case 7:
+            //Pedimos que nos imprima las matrices de direcciones fisicas
+            fd1 = open(myfifo1,O_WRONLY);
+            write(fd1, estado7, sizeof(estado7));
+            //Cerramos para poder obtener una respuesta
+            close(fd1);
+            break;
 		case 0:
 			fd1 = open(myfifo1,O_WRONLY);
 			strcpy(str4,orden);
@@ -75,7 +83,7 @@ void analiza(int opt, int fd1, char *myfifo1)
 	}
 }
 
-int administra(char *str1, int fd1, char * myfifo1, unsigned char ** Dir_RAM, unsigned char ** Dir_SWAP, lista *L, int ram)
+int administra(char *str1, int fd1, char * myfifo1, lista *L, int ram)
 {
 	int i,k,j = 0;
 	int memoria, vejez = 0; 
@@ -87,6 +95,7 @@ int administra(char *str1, int fd1, char * myfifo1, unsigned char ** Dir_RAM, un
     char mem[3];
     char proc[3];
     int id_aux;
+    unsigned char fila[3];
     posicion p1,p2,p3;
     elemento e1,e2;
 
@@ -114,6 +123,7 @@ int administra(char *str1, int fd1, char * myfifo1, unsigned char ** Dir_RAM, un
                         if (e1.ID_PROCESO == 0)
                         {
                             contador_aux = contador_aux + e1.PAG_TAM;
+                            e1.ID_MEM_FISICA = administra_matriz(Dir_RAM, process, 0, 36, fila);
                             e1.ID_PROCESO = process;
                             e1.TTL = process;
                             Replace(&L[0], p1, e1);
@@ -151,6 +161,8 @@ int administra(char *str1, int fd1, char * myfifo1, unsigned char ** Dir_RAM, un
                 if (e1.ID_PROCESO == id_aux)
                 {
                     contador_aux = contador_aux + e1.PAG_TAM;
+                    administra_matriz(Dir_RAM, e1.ID_PROCESO, 1, 36, fila);
+                    e1.ID_MEM_FISICA = 0;
                     e1.ID_PROCESO = 0;
                     e1.TTL = 0;
                     Replace(&L[0], p1, e1);
@@ -214,6 +226,8 @@ int administra(char *str1, int fd1, char * myfifo1, unsigned char ** Dir_RAM, un
                             if (e2.ID_PROCESO == 0)
                             {
                                 e2 = e1;
+                                administra_matriz(Dir_RAM, e1.ID_PROCESO, 1, 36, fila);
+                                e2.ID_MEM_FISICA = administra_matriz(Dir_SWAP, e1.ID_PROCESO, 0, 24, fila);
                                 e1.ID_MEM_FISICA = 0;
                                 e1.ID_PROCESO = 0;
                                 e1.TTL = 0;
@@ -298,6 +312,8 @@ int administra(char *str1, int fd1, char * myfifo1, unsigned char ** Dir_RAM, un
                             if (e1.ID_PROCESO == 0)
                             {
                                 e1 = e2;
+                                administra_matriz(Dir_SWAP, e2.ID_PROCESO, 1, 24, fila);
+                                e1.ID_MEM_FISICA = administra_matriz(Dir_RAM, e2.ID_PROCESO, 0, 36, fila);
                                 e2.ID_MEM_FISICA = 0;
                                 e2.ID_PROCESO = 0;
                                 e2.TTL = 0;
@@ -339,7 +355,7 @@ int administra(char *str1, int fd1, char * myfifo1, unsigned char ** Dir_RAM, un
                 printf("Pagina %d en RAM:\n", i);
                 e1=Position(&L[0],p1);
                 printf("\tID de pagina:%d\n",e1.ID_PAGINA);
-                printf("\tID de memoria fisica:%d\n",e1.ID_MEM_FISICA);
+                printf("\tID de memoria fisica:%.2x\n",e1.ID_MEM_FISICA);
                 printf("\tID de proceso:%d\n",e1.ID_PROCESO);
                 printf("\tTTL:%d\n",e1.TTL);
                 printf("\tNumero de segmento:%d\n",e1.NO_SEGMENTO);
@@ -356,13 +372,17 @@ int administra(char *str1, int fd1, char * myfifo1, unsigned char ** Dir_RAM, un
                 printf("Pagina %d en SWAP:\n", i);
                 e2=Position(&L[1],p2);
                 printf("\tID de pagina:%d\n",e2.ID_PAGINA);
-                printf("\tID de memoria fisica:%d\n",e2.ID_MEM_FISICA);
+                printf("\tID de memoria fisica:%.2x\n",e2.ID_MEM_FISICA);
                 printf("\tID de proceso:%d\n",e2.ID_PROCESO);
                 printf("\tTTL:%d\n",e2.TTL);
                 printf("\tNumero de segmento:%d\n",e2.NO_SEGMENTO);
                 printf("\tTamaño de pagina:%d\n",e2.PAG_TAM);
                 p2=Following(&L[1],p2);
             }
+            break;
+        case '7':
+            Imprime_Matriz(Dir_RAM, 36, 3);
+            Imprime_Matriz(Dir_SWAP, 24, 3);
             break;
     }
 }

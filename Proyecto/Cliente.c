@@ -1,6 +1,5 @@
 /*Soy el cliente*/
 #include "funciones.h"
-#include "matrices.h"
 #define NUM_LISTAS 2
 
 int main(int argc, char const *argv[])
@@ -9,8 +8,8 @@ int main(int argc, char const *argv[])
     int ram = 144;
     swap = 96;
     process = 0;
-    unsigned char **Dir_RAM = NULL;
-    unsigned char **Dir_SWAP = NULL;
+    Dir_RAM = NULL;
+    Dir_SWAP = NULL;
     // FIFO file path 
     char * myfifo1 = "/tmp/myfifo1";
     char * orden = "fin\n";
@@ -62,8 +61,6 @@ int main(int argc, char const *argv[])
     Dir_SWAP = Aparta_Matriz (col, rowB);
     Llena_Matriz (Dir_RAM, rowA, col);
     Llena_Matriz (Dir_SWAP, rowB, col);
-    //Imprime_Matriz(Dir_RAM, rowA, col);
-    //Imprime_Matriz(Dir_SWAP, rowB, col);
     while ((strcmp(str1, orden) != 0) || (strcmp(str2, orden) != 0)) 
     { 
         // Abrimos el fifo como solo lectura
@@ -72,7 +69,7 @@ int main(int argc, char const *argv[])
         read(fd1, str1, sizeof(str1));
         if ((strcmp(str1,orden)) != 0)
         {
-            ram = administra(str1, fd1, myfifo1, Dir_RAM, Dir_SWAP, L, ram);
+            ram = administra(str1, fd1, myfifo1, L, ram);
         }else{
             //Destruir las listas
             for(i=0;i<NUM_LISTAS;i++)

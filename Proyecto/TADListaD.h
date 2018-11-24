@@ -27,7 +27,7 @@ EL CODIGO QUE IMPLEMENTA LAS FUNCIONES ES EL ARCHIVO: TADListaDoblementeLigada.c
 typedef struct elemento
 {
 	int ID_PAGINA;
-	int ID_MEM_FISICA;
+	unsigned char ID_MEM_FISICA;
 	int ID_PROCESO;
 	int TTL;
 	int NO_SEGMENTO;
