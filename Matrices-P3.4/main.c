@@ -53,7 +53,7 @@ int main(int argc, char const *argv[])
 							return -1;
 							break;
 						case 0:
-							printf("soy el hijo %d, obtuve el siguiente resultado: ", i);
+							//printf("soy el hijo %d, obtuve el siguiente resultado: ", i);
 							obten_Fila(matrixA, i, colA, fila);
 							for (int y = 0; y < colB; ++y)
 							{
@@ -87,6 +87,7 @@ int main(int argc, char const *argv[])
 					int fila[colA];
 					int resultado[colB];
 					int res = 0;
+					int aux;
 					switch(pid)
 					{
 						case -1:
@@ -94,11 +95,13 @@ int main(int argc, char const *argv[])
 							return -1;
 							break;
 						case 0:
-							printf("soy el hijo %d, obtuve el siguiente resultado: ", i);
+							//printf("soy el hijo %d, obtuve el siguiente resultado: ", i);
 							if (i == (procNum-1))
 							{
 								m = i;
-								for (m; m < rowA; ++m)
+								aux = rowA - procNum;
+								aux = aux + 1;
+								for (m; m <= aux; ++m)
 								{
 									obten_Fila(matrixA, m, colA, fila);
 									for (int y = 0; y < colB; ++y)
